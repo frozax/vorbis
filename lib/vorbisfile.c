@@ -19,6 +19,9 @@
 #include <errno.h>
 #include <string.h>
 #include <math.h>
+#ifdef _WIN32
+#include <Windows.h>
+#endif
 
 #include "vorbis/codec.h"
 
@@ -1009,6 +1012,23 @@ int ov_open(FILE *f,OggVorbis_File *vf,const char *initial,long ibytes){
 
   return ov_open_callbacks((void *)f, vf, initial, ibytes, callbacks);
 }
+
+#ifdef _WIN32
+int ov_mbfopen(const char *path, OggVorbis_File *vf)
+{
+    int ret;
+	int nLen = (int)strlen(path);
+    WCHAR fileNameWideChar[MAX_PATH];
+	MultiByteToWideChar(CP_UTF8, 0, &path[0], nLen + 1, fileNameWideChar, nLen + 1);
+	FILE* f = _wfopen(fileNameWideChar, L"rb");
+	if (!f)
+		return -1;
+	ret = ov_open(f, vf, NULL, 0);
+	if (ret)
+		fclose(f);
+	return ret;
+}
+#endif
 
 int ov_fopen(const char *path,OggVorbis_File *vf){
   int ret;

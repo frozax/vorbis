@@ -4,6 +4,7 @@ LIBRARY
 EXPORTS
 ov_clear
 ov_open
+ov_mbfopen
 ov_open_callbacks
 ov_bitrate
 ov_bitrate_instant
